@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pomodoro Belajar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Fredoka One', cursive;
+      background-color: #fff8e1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    h1 {
+      color: #ff6f61;
+      margin-bottom: 1rem;
+    }
+    #timer {
+      font-size: 5rem;
+      color: #6a1b9a;
+      margin: 1rem 0;
+    }
+    button {
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 20px;
+      background-color: #81d4fa;
+      color: #004d40;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #4fc3f7;
+    }
+    .cute-img {
+      width: 150px;
+      margin-top: 1.5rem;
+    }
+    #log {
+      margin-top: 2rem;
+      font-size: 1rem;
+      color: #4e342e;
+      max-height: 150px;
+      overflow-y: auto;
+      width: 80%;
+      background: #ffecb3;
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    #minecraft {
+      margin-top: 2rem;
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌟 Pomodoro Belajar 🌟</h1>
+  <div id="timer">60:00</div>
+  <button id="startBtn">Mulai Belajar</button>
+  <img src="https://i.pinimg.com/originals/7a/20/c9/7a20c98c1ab9a7594fa69e332d1a3954.gif" alt="Minecraft Cute" id="minecraft" />
+  <div id="log"></div>
+
+  <audio id="notifSound">
+    <source src="https://www.soundjay.com/buttons/sounds/button-3.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const studyDuration = 60 * 60;
+    const breakDuration = 15 * 60;
+    let isBreak = false;
+    let interval;
+    let sessionCount = 0;
+
+    const timerDisplay = document.getElementById("timer");
+    const startBtn = document.getElementById("startBtn");
+    const notifSound = document.getElementById("notifSound");
+    const logBox = document.getElementById("log");
+
+    function updateTimer(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function playSound() {
+      notifSound.play();
+    }
+
+    function logSession(message) {
+      const now = new Date().toLocaleTimeString();
+      const logEntry = document.createElement("div");
+      logEntry.textContent = `[${now}] ${message}`;
+      logBox.appendChild(logEntry);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function startSession() {
+      let time = isBreak ? breakDuration : studyDuration;
+      updateTimer(time);
+      clearInterval(interval);
+
+      if (!isBreak) {
+        sessionCount++;
+        logSession(`Sesi belajar ke-${sessionCount} dimulai!`);
+      } else {
+        logSession(`Waktunya istirahat.`);
+      }
+
+      interval = setInterval(() => {
+        time--;
+        updateTimer(time);
+        if (time <= 0) {
+          clearInterval(interval);
+          playSound();
+          alert(isBreak ? "Waktu belajar dimulai! 📚" : "Istirahat dulu yuk! 🎉");
+          isBreak = !isBreak;
+          startSession();
+        }
+      }, 1000);
+    }
+
+    startBtn.addEventListener("click", () => {
+      isBreak = false;
+      startSession();
+      startBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>
